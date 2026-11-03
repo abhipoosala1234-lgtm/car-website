@@ -1,0 +1,1210 @@
+/* ==========================================================================
+   NOCTIS — BRAND STYLESHEET
+   Strict Minimalist Architecture
+   Flat solid colors, 1px hairlines, photography and type.
+   NO gradients, NO glassmorphism, NO blur, NO drop shadows, NO rounded cards.
+   ========================================================================== */
+
+:root {
+  /* Color Palette */
+  --asphalt: #07080A;      /* Page background */
+  --graphite: #121418;     /* Secondary dark surface */
+  --fog: #8A8F98;          /* Muted body and labels */
+  --bone: #EDEAE4;         /* High-contrast text */
+  --xenon: #CFE3FF;        /* Electric light signature */
+  --taillight: #E1251B;    /* Precision red accent */
+  --hairline: rgba(237, 234, 228, 0.12); /* Subtle structural divider */
+
+  /* Typography */
+  --font-display: 'Archivo', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-hud: 'JetBrains Mono', monospace;
+
+  /* Animation Easing */
+  --easing: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-normal: 0.7s;
+  --duration-slow: 0.9s;
+}
+
+/* --------------------------------------------------------------------------
+   Reset & Baseline
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border-radius: 0 !important; /* Strict orthogonal design - zero bubbly rounds */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  background-color: var(--asphalt);
+  color: var(--bone);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: clip; /* Clean clipping without breaking position: sticky */
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--asphalt);
+  color: var(--bone);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: clip;
+}
+
+/* Hide native cursor only when fine pointer is active */
+@media (pointer: fine) {
+  body.custom-cursor-enabled,
+  body.custom-cursor-enabled a,
+  body.custom-cursor-enabled button,
+  body.custom-cursor-enabled input {
+    cursor: none !important;
+  }
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  background: none;
+  border: none;
+  color: inherit;
+  font: inherit;
+}
+
+/* --------------------------------------------------------------------------
+   Typography Classes
+   -------------------------------------------------------------------------- */
+.font-display {
+  font-family: var(--font-display);
+  font-stretch: 125%;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 0.95;
+  font-size: clamp(40px, 7vw, 120px);
+}
+
+.font-body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: clamp(15px, 1.1vw, 17px);
+  line-height: 1.6;
+  max-width: 52ch;
+  color: var(--fog);
+}
+
+.font-hud {
+  font-family: var(--font-hud);
+  font-weight: 400;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 1.4;
+}
+
+/* Headline Reveal Masks */
+.reveal-line {
+  display: block;
+  overflow: hidden;
+}
+
+.reveal-inner {
+  display: block;
+  transform: translateY(100%);
+  transition: transform var(--duration-slow) var(--easing);
+}
+
+.is-active .reveal-inner,
+.reveal-triggered .reveal-inner {
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+
+/* --------------------------------------------------------------------------
+   Film Grain Overlay (Fixed, 3-4% opacity, no gradient, no vignette)
+   -------------------------------------------------------------------------- */
+#film-grain {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 990;
+  opacity: 0.035;
+  mix-blend-mode: screen;
+}
+
+/* --------------------------------------------------------------------------
+   Custom Headlight Cursor (Desktop only)
+   -------------------------------------------------------------------------- */
+#cursor-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  display: none;
+}
+
+@media (pointer: fine) {
+  #cursor-container {
+    display: block;
+  }
+}
+
+#cursor-dot {
+  position: absolute;
+  top: -3px;
+  left: -3px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--xenon);
+  transition: background-color 0.12s linear, width 0.25s var(--easing), height 0.25s var(--easing), transform 0.25s var(--easing);
+}
+
+#cursor-ring {
+  position: absolute;
+  top: -14px;
+  left: -14px;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--xenon);
+  transition: border-color 0.12s linear, opacity 0.25s var(--easing), transform 0.25s var(--easing);
+}
+
+#cursor-label {
+  position: absolute;
+  top: -8px;
+  left: 32px;
+  font-family: var(--font-hud);
+  font-size: 10px;
+  color: var(--xenon);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s var(--easing);
+}
+
+/* Cursor Morphed State: Light Bar */
+#cursor-container.is-hovering #cursor-dot {
+  top: -1px;
+  left: -22px;
+  width: 44px;
+  height: 2px;
+  background-color: var(--xenon);
+}
+
+#cursor-container.is-hovering #cursor-ring {
+  opacity: 0;
+  transform: scale(0.6);
+}
+
+#cursor-container.is-hovering #cursor-label {
+  opacity: 1;
+}
+
+/* Click flash: 120ms brighter */
+#cursor-container.is-down #cursor-dot {
+  background-color: #FFFFFF;
+}
+
+/* --------------------------------------------------------------------------
+   Preloader
+   -------------------------------------------------------------------------- */
+#preloader {
+  position: fixed;
+  inset: 0;
+  background-color: var(--asphalt);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.6s var(--easing), visibility 0.6s var(--easing);
+}
+
+#preloader.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.preloader-wordmark {
+  font-size: clamp(36px, 6vw, 72px);
+  margin-bottom: 28px;
+  letter-spacing: 0.08em;
+}
+
+.preloader-track {
+  width: 180px;
+  height: 1px;
+  background-color: var(--hairline);
+  position: relative;
+  overflow: hidden;
+}
+
+.preloader-line {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: var(--xenon);
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  transition: transform 0.1s linear, background-color 0.12s linear;
+}
+
+.preloader-line.flash {
+  background-color: #FFFFFF;
+}
+
+.preloader-counter {
+  font-family: var(--font-hud);
+  font-size: 11px;
+  color: var(--fog);
+  margin-top: 14px;
+  letter-spacing: 0.14em;
+}
+
+/* --------------------------------------------------------------------------
+   Navigation
+   -------------------------------------------------------------------------- */
+#main-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 500;
+  mix-blend-mode: difference;
+  transition: transform 0.4s var(--easing);
+}
+
+#main-nav.nav-hidden {
+  transform: translateY(-100%);
+}
+
+.nav-brand {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: #FFFFFF;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+
+.nav-item a {
+  font-family: var(--font-hud);
+  font-size: 11px;
+  color: #FFFFFF;
+  letter-spacing: 0.12em;
+  transition: opacity 0.2s linear;
+  position: relative;
+  padding: 4px 0;
+}
+
+.nav-item a:hover {
+  opacity: 0.7;
+}
+
+.nav-item a:focus-visible,
+.btn-reserve:focus-visible,
+.lineup-slide:focus-visible,
+.cta-link:focus-visible {
+  outline: 1px solid var(--xenon);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Scrollytelling Stages & Wrappers
+   -------------------------------------------------------------------------- */
+.scrolly-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.sticky-stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background-color: var(--asphalt);
+}
+
+.stage-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
+}
+
+/* Section 1px Progress Bar */
+.section-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  width: 0%;
+  background-color: var(--xenon);
+  z-index: 30;
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+/* --------------------------------------------------------------------------
+   Section 1 — Hero Specifics
+   -------------------------------------------------------------------------- */
+#hero-wrapper {
+  height: 600vh; /* Controlled via config */
+}
+
+/* HUD Overlay */
+.hero-hud {
+  position: absolute;
+  left: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  color: var(--fog);
+}
+
+.hud-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hud-label {
+  font-family: var(--font-hud);
+  font-size: 10px;
+  color: var(--fog);
+  opacity: 0.6;
+}
+
+.hud-value-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hud-tick {
+  width: 2px;
+  height: 11px;
+  background-color: var(--taillight);
+}
+
+.hud-value {
+  font-family: var(--font-hud);
+  font-size: 12px;
+  color: var(--bone);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Hero Text Chapters (Placed in sky, never over the car) */
+.hero-chapters-container {
+  position: absolute;
+  top: 15%;
+  left: 8vw;
+  right: 8vw;
+  max-width: 1200px;
+  z-index: 15;
+  pointer-events: none;
+}
+
+.hero-chapter {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s var(--easing), visibility 0.6s var(--easing);
+}
+
+.hero-chapter.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.hero-title {
+  font-size: clamp(48px, 9vw, 130px);
+  color: var(--bone);
+  margin-bottom: 8px;
+}
+
+.hero-subtitle {
+  font-size: clamp(16px, 1.4vw, 20px);
+  color: var(--fog);
+  margin-bottom: 24px;
+}
+
+.hero-scroll-hint {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--fog);
+}
+
+.hint-line {
+  width: 32px;
+  height: 1px;
+  background-color: var(--xenon);
+  animation: pulse-line 2s infinite ease-in-out;
+}
+
+@keyframes pulse-line {
+  0%, 100% { opacity: 0.25; transform: scaleX(0.7); }
+  50% { opacity: 1; transform: scaleX(1); }
+}
+
+.hero-statement {
+  font-size: clamp(32px, 5.5vw, 76px);
+  color: var(--bone);
+  max-width: 18ch;
+}
+
+.hero-specs-row {
+  margin: 18px 0 28px 0;
+  color: var(--fog);
+}
+
+.cta-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-hud);
+  font-size: 11px;
+  color: var(--bone);
+  letter-spacing: 0.12em;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--hairline);
+  transition: border-color 0.2s linear, color 0.2s linear;
+}
+
+.cta-link:hover {
+  border-color: var(--xenon);
+  color: var(--xenon);
+}
+
+/* --------------------------------------------------------------------------
+   Section 2 — Statement (Not pinned, 100vh)
+   -------------------------------------------------------------------------- */
+#statement-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10vw;
+  background-color: var(--asphalt);
+  position: relative;
+  border-top: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.statement-content {
+  max-width: 1100px;
+  text-align: center;
+}
+
+.statement-label {
+  color: var(--fog);
+  margin-bottom: 36px;
+  display: block;
+}
+
+.statement-headline {
+  font-size: clamp(32px, 5vw, 68px);
+  color: var(--bone);
+  line-height: 1.15;
+}
+
+.statement-word {
+  opacity: 0.15;
+  transition: opacity 0.2s linear;
+  display: inline-block;
+  white-space: pre;
+}
+
+/* --------------------------------------------------------------------------
+   Section 3 — Dismantle (Pinned, 350vh)
+   -------------------------------------------------------------------------- */
+#dismantle-wrapper {
+  height: 350vh; /* Controlled via config */
+}
+
+.dismantle-header {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  z-index: 20;
+}
+
+.dismantle-title {
+  font-size: clamp(32px, 4vw, 56px);
+  color: var(--bone);
+}
+
+/* Interactive Callout Points */
+.callout-item {
+  position: absolute;
+  z-index: 25;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-50%);
+  transition: opacity 0.5s var(--easing), visibility 0.5s var(--easing);
+  pointer-events: none;
+}
+
+.callout-item[data-align="right"] {
+  transform: translate(-100%, -50%);
+}
+
+.callout-item.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.callout-anchor {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.callout-dot {
+  width: 6px;
+  height: 6px;
+  background-color: var(--xenon);
+  flex-shrink: 0;
+}
+
+.callout-line {
+  width: 48px;
+  height: 1px;
+  background-color: var(--xenon);
+  flex-shrink: 0;
+}
+
+.callout-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 12px;
+  white-space: nowrap;
+}
+
+.callout-code {
+  font-family: var(--font-hud);
+  font-size: 11px;
+  color: var(--xenon);
+  letter-spacing: 0.12em;
+}
+
+.callout-desc {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--bone);
+}
+
+.callout-item[data-align="right"] .callout-anchor {
+  flex-direction: row-reverse;
+}
+
+.callout-item[data-align="right"] .callout-content {
+  text-align: right;
+}
+
+/* --------------------------------------------------------------------------
+   Section 4 — Lineup (Hover Accordion, Not pinned, 100vh)
+   -------------------------------------------------------------------------- */
+#lineup {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--asphalt);
+  padding: 48px 0 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.lineup-header {
+  padding: 0 40px 28px 40px;
+}
+
+.lineup-label {
+  color: var(--fog);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.lineup-heading {
+  font-size: clamp(28px, 4vw, 52px);
+  color: var(--bone);
+}
+
+.lineup-accordion {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: calc(100vh - 160px);
+  min-height: 520px;
+  border-top: 1px solid var(--hairline);
+  position: relative;
+}
+
+.lineup-slide {
+  position: relative;
+  height: 100%;
+  border-right: 1px solid var(--hairline);
+  background-color: var(--asphalt);
+  overflow: hidden;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 24px;
+  /* Flex grow animation */
+  flex-grow: 1;
+  flex-basis: 12vw;
+  transition: flex-grow var(--duration-normal) var(--easing),
+              flex-basis var(--duration-normal) var(--easing);
+  outline: none;
+}
+
+.lineup-slide:last-child {
+  border-right: none;
+}
+
+.lineup-slide.is-open {
+  flex-grow: 4.5;
+  flex-basis: 52vw;
+}
+
+/* Closed Slide Content */
+.slide-closed-view {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  position: relative;
+  z-index: 5;
+  transition: opacity 0.3s var(--easing);
+}
+
+.lineup-slide.is-open .slide-closed-view {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.slide-num {
+  font-family: var(--font-hud);
+  font-size: 11px;
+  color: var(--fog);
+}
+
+.slide-vertical-name {
+  font-family: var(--font-hud);
+  font-size: 13px;
+  color: var(--bone);
+  letter-spacing: 0.16em;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin-top: auto;
+  margin-bottom: 32px;
+}
+
+/* Background/Cropped Car Image on Closed Slide */
+.slide-bg-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 85% center;
+  filter: grayscale(100%) brightness(25%);
+  z-index: 1;
+  transition: opacity 0.4s var(--easing);
+}
+
+.lineup-slide.is-open .slide-bg-img {
+  opacity: 0;
+}
+
+/* Open Slide Content */
+.slide-open-view {
+  position: absolute;
+  inset: 0;
+  padding: 32px 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.4s var(--easing), visibility 0.4s var(--easing);
+}
+
+.lineup-slide.is-open .slide-open-view {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+/* Staggered line reveal for open slide text */
+.slide-model-title,
+.slide-tagline,
+.slide-specs-row,
+.slide-actions-row {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s var(--easing), transform 0.5s var(--easing);
+}
+
+.lineup-slide.is-open .slide-model-title {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.12s;
+}
+
+.lineup-slide.is-open .slide-tagline {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.18s;
+}
+
+.lineup-slide.is-open .slide-specs-row {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.24s;
+}
+
+.lineup-slide.is-open .slide-actions-row {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 0.30s;
+}
+
+.slide-open-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.slide-model-title {
+  font-size: clamp(36px, 5vw, 68px);
+  color: var(--bone);
+}
+
+/* Open Car Image: Sits on shared floor line at 72% height */
+.slide-car-stage {
+  position: absolute;
+  top: 15%;
+  left: 0;
+  width: 100%;
+  height: 57%;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.slide-car-img {
+  width: 85%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: none;
+  transform: translateX(-6%);
+  opacity: 0;
+  transition: transform var(--duration-normal) var(--easing), opacity var(--duration-normal) var(--easing);
+}
+
+.lineup-slide.is-open .slide-car-img {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Shared Floor Line Indicator */
+.slide-floor-line {
+  position: absolute;
+  top: 72%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--hairline);
+  z-index: 2;
+}
+
+/* Details Footer in Open Slide */
+.slide-details-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 5;
+}
+
+.slide-tagline {
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--fog);
+}
+
+.slide-specs-row {
+  display: flex;
+  gap: 28px;
+  color: var(--bone);
+}
+
+.spec-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.spec-label {
+  font-family: var(--font-hud);
+  font-size: 9px;
+  color: var(--fog);
+}
+
+.spec-val {
+  font-family: var(--font-hud);
+  font-size: 12px;
+  color: var(--bone);
+}
+
+.slide-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+/* Flat Color Swatches (No rounded corners, solid squares) */
+.swatches-row {
+  display: flex;
+  gap: 8px;
+}
+
+.swatch-btn {
+  width: 12px;
+  height: 12px;
+  border: none;
+  padding: 0;
+  display: block;
+}
+
+.swatch-btn.is-active {
+  outline: 1px solid var(--bone);
+  outline-offset: 2px;
+}
+
+/* Slide Entrance Animation on Section Scroll */
+.lineup-slide.slide-enter {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s var(--easing), transform 0.8s var(--easing);
+}
+
+.lineup-accordion.is-entered .lineup-slide.slide-enter {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --------------------------------------------------------------------------
+   Section 5 — Reserve (100vh)
+   -------------------------------------------------------------------------- */
+#reserve-section {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--asphalt);
+  padding: 0 24px;
+  text-align: center;
+  position: relative;
+}
+
+.reserve-content {
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.reserve-headline {
+  font-size: clamp(40px, 7vw, 100px);
+  color: var(--bone);
+}
+
+.reserve-body {
+  font-size: 16px;
+  color: var(--fog);
+  margin-bottom: 12px;
+}
+
+.btn-reserve {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--xenon);
+  background-color: transparent;
+  padding: 16px 36px;
+  font-family: var(--font-hud);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  color: var(--xenon);
+  position: relative;
+  transition: background-color 0.25s var(--easing), color 0.25s var(--easing);
+}
+
+.btn-reserve-tick {
+  width: 0;
+  height: 12px;
+  background-color: var(--taillight);
+  display: inline-block;
+  transition: width 0.2s var(--easing), margin-right 0.2s var(--easing);
+}
+
+.btn-reserve:hover {
+  background-color: var(--xenon);
+  color: var(--asphalt);
+}
+
+.btn-reserve:hover .btn-reserve-tick {
+  width: 2px;
+  margin-right: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Footer
+   -------------------------------------------------------------------------- */
+#main-footer {
+  border-top: 1px solid var(--hairline);
+  background-color: var(--asphalt);
+  padding: 64px 40px 48px 40px;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 64px;
+  flex-wrap: wrap;
+  gap: 48px;
+}
+
+.footer-brand {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--bone);
+}
+
+.footer-columns {
+  display: flex;
+  gap: 64px;
+  flex-wrap: wrap;
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-col-title {
+  font-family: var(--font-hud);
+  font-size: 10px;
+  color: var(--fog);
+  margin-bottom: 4px;
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-links a {
+  font-family: var(--font-hud);
+  font-size: 11px;
+  color: var(--fog);
+  transition: color 0.2s linear;
+}
+
+.footer-links a:hover {
+  color: var(--bone);
+}
+
+.footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--hairline);
+  padding-top: 24px;
+  color: var(--fog);
+  font-size: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive & Mobile Adaptations (< 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  #main-nav {
+    padding: 0 20px;
+  }
+
+  .nav-links {
+    gap: 20px;
+  }
+
+  .hero-hud {
+    left: 20px;
+    top: auto;
+    bottom: 24px;
+    transform: none;
+    flex-direction: row;
+    gap: 24px;
+  }
+
+  .hero-chapters-container {
+    top: 12%;
+    left: 20px;
+    right: 20px;
+  }
+
+  .dismantle-header {
+    top: 24px;
+    left: 20px;
+  }
+
+  /* Accordion Mobile: Vertical Rows (72px collapsed) */
+  .lineup-accordion {
+    flex-direction: column;
+    height: auto;
+    min-height: unset;
+  }
+
+  .lineup-slide {
+    width: 100%;
+    height: 72px;
+    border-right: none;
+    border-bottom: 1px solid var(--hairline);
+    flex-grow: 0;
+    flex-basis: 72px;
+    padding: 0 20px;
+    justify-content: center;
+    transition: height var(--duration-normal) var(--easing);
+  }
+
+  .lineup-slide.is-open {
+    height: 520px;
+    flex-basis: 520px;
+    padding: 24px 20px;
+    justify-content: space-between;
+  }
+
+  .slide-closed-view {
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+  }
+
+  .slide-vertical-name {
+    writing-mode: horizontal-tb;
+    transform: none;
+    margin: 0 0 0 16px;
+  }
+
+  .slide-open-view {
+    padding: 20px;
+  }
+
+  .slide-car-stage {
+    top: 22%;
+    height: 48%;
+  }
+
+  .footer-columns {
+    gap: 36px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Accessibility: Prefers-Reduced-Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Remove scrollytelling pinning */
+  #hero-wrapper,
+  #dismantle-wrapper {
+    height: auto !important;
+  }
+
+  .sticky-stage {
+    position: relative !important;
+    height: 90vh !important;
+  }
+
+  .hero-chapter {
+    position: relative !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    margin-bottom: 60px;
+  }
+
+  .callout-item {
+    opacity: 1 !important;
+    visibility: visible !important;
+    position: relative !important;
+    inset: auto !important;
+    margin-bottom: 16px;
+  }
+
+  #cursor-container {
+    display: none !important;
+  }
+}
